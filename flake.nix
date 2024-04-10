@@ -10,6 +10,7 @@
     ...
   } @ inputs:
     flake-parts.lib.mkFlake {inherit inputs;} {
+      imports = [./example.nix];
       systems = import systems;
       transposition.flakeTex.adHoc = true;
       perSystem = {
@@ -22,11 +23,12 @@
           runnerCat = {
             name,
             runner,
+            src,
             onlyLast ? false,
-          }: src:
+          }:
             builtins.readFile
             (pkgs.runCommand "${name}-slide-builder.sh" {} ''
-              cat ${pkgs.writeText "${name}-runner-inputs.src" src} | ${runner} > $out
+              ${runner} < ${pkgs.writeText "${name}-runner-inputs.src" src} &> $out || true;
             '');
           code = {
             name,
@@ -35,12 +37,12 @@
             ...
           }: rec {
             inherit name;
-            runnerOutput = runnerCat {inherit name runner;};
+            runnerOutput = runnerCat {inherit name runner src;};
             body = ''
               \begtt \hisyntax{python}
               ${src}
               \endtt
-
+              \hrule
               \begtt
               ${runnerOutput}
               \endtt
@@ -54,12 +56,11 @@
             ...
           }: rec {
             inherit name;
-            runnerOutputs =
-              builtins.map (runnerCat {
-                inherit name runner;
+            runnerOutputs = builtins.map (src:
+              runnerCat {
+                inherit name runner src;
                 onlyLast = true;
-              })
-              (builtins.map printer src);
+              }) (builtins.map printer src);
             body = ''
               \begtt \hisyntax{python}
               ${builtins.concatStringsSep "\n" (builtins.map (
