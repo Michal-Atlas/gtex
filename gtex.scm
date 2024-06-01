@@ -50,7 +50,8 @@
                            '#$(map car inputs)
                            '#$(map cdr inputs))))))))))
        (build-derivations %store (list mfile))
-       (delete-file inp-file)
+       (when (file-exists? inp-file)
+         (delete-file inp-file))
        (copy-file
         (derivation->output-path mfile)
         inp-file)))))

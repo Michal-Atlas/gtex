@@ -1,4 +1,11 @@
-\directlua{dofile('gtex.lua')}
+\def\_gscriptpath{\jobname.scm}
+\def\_grespath{\jobname.inp}
+\isfile\_gscriptpath\iffalse\opwarning{
+The auxiliary file \_gscriptpath{} was created,
+you can use `gtex \_gscriptpath` to create the file `\_grespath` that will contain this document's dependencies.
+}\fi
+
+\directlua{require('gtex.lua')}
 
 \def\trim#1{\directlua{
     local path = [[#1]]
@@ -9,18 +16,6 @@
 
 \def\includett{\scantoeol\_includett}
 
-\def\_gscriptpath{\jobname.scm}
-\def\_grespath{\jobname.inp}
-\newread\_gscript
-% \openout\_gscript=\_gscriptpath
-% \newread\_gres
-% \openin\_gres=\_grespath
-\isfile\_gscriptpath\iffalse\opwarning{
-The auxiliary file \_gscriptpath was created,
-you can use `guix build -f \_gscriptpath -r \_grespath` to update this document's dependencies.
-}\fi
-
-% \def\guix#1#2{\write\_gscript{#1:#2}}
 \def\guix#1#2{\directlua{guix([[#1]], [[#2]])}}
 \def\guixref#1{\directlua{guixref([[#1]])}}
 
@@ -64,6 +59,7 @@ you can use `guix build -f \_gscriptpath -r \_grespath` to update this document'
 \newcount\gtexline
 
 \def\gtexgraphvizid{graphviz\the\gtexline}
+
 \def\graphviz#1{
   \global\advance\gtexline by 1
   \guix{\gtexgraphvizid}%

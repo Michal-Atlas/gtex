@@ -23,7 +23,7 @@ end
 function insertAPImage(image, mul)
    local i = img.scan { filename = image };
    if (i == nil) then
-      tex.print("??\\opwarning{File " .. image .. " could not be opened}")
+      tex.print("??\\opwarning{Image " .. image .. " could not be opened}")
       return
    end
    local ratio = math.min(tex.hsize / i.width, tex.vsize / i.height);
@@ -45,7 +45,7 @@ end
 function load_guixrefs(path)
    local inputs_file = io.open(path, "r")
    if (inputs_file == nil) then
-      tex.print("\\opwarning{The auxiliary file " .. path .. " does not exist yet, please run guix to create it}")
+      tex.print("\\opwarning{The auxiliary file " .. path .. " does not exist yet, please run gtex to create it}")
    else
       local s = inputs_file:read("*a")
       for k, v in s:gmatch("([^:]+):([^\n]*)\n") do
