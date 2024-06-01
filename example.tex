@@ -1,0 +1,171 @@
+\input gtex.tex
+
+\def\stit{\pg;\tit}
+\def\ssec{\pg;\sec}
+
+
+\input modern.tex
+
+\tit Intro to G\TeX{}
+
+\stit Line-by-line evaluation
+
+\pg;
+\sec Node
+\typosize[24/27]
+{
+\def\printer#1{console.log(#1)}
+\def\evaluator{node}
+\showline{1 + 1}
+\showline{(3/5) + 1}
+\showline{[1,2,3,4,5].map(x => x + 1)}
+}
+
+\sec Guile
+
+\showline{(+ 1 1)}
+\showline{(+ (/ 3 5) 1)}
+\showline{(map 1+ '(1 2 3 4 5))}
+\pg+\showline{\bslash"Strings also sort of work\bslash"}
+
+\ssec Special syntax
+
+«node
+x = { y : 2 }
+console.log(x['y'] + 5)
+»
+
+\everytt={\typosize[24/27]}
+\begtt
+ «node
+ x = { y : 2 }
+ console.log(x['y'] + 5)
+ »
+\endtt
+
+\ssec Node
+
+You can still include standard text:
+
+* even \OpTeX{} lists
+* many of them
+\vskip50pt
+
+«node
+x = { y : 2 }
+console.log(x['y'] + 5)
+»
+
+\ssec Python 3
+
+«python/bin/python3
+def foo():
+  print(10 % 3)
+  return 0 % 2
+  another
+
+foo()
+»
+
+\ssec Python 2
+
+«python2
+print 10 % 3
+»
+
+\ssec SBCL
+
+«sbcl --script
+(defun foo (i)
+  (loop for x to i do (format t "Hello ~a~%" x)))
+
+(foo 5)
+»
+
+\ssec Hubble
+
+\rinspic{hubble}{https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Hubble_ultra_deep_field.jpg/1200px-Hubble_ultra_deep_field.jpg}{XI2MgQY50Y3iPsfaQCvoEY/siwhl+LB1Vnjy0RkKJAg=}
+
+\ssec Win 7
+
+\rinspic{im}{https://i.stack.imgur.com/LjGip.png}{sB5X/UMwqmWYLiqiN8jiQDwfN13QQ5cII8BA/w7ximo=}
+
+\ssec Sequent (SVG)
+
+\guix{svg}{((@ (gtex) svg-image) \_remotefile{https://wikimedia.org/api/rest_v1/media/math/render/svg/e0c5b66a8fed889a35d2ea5ff95f0c604351346d}{3yC9Cu5w2uIKfAy8LEZERNCVDG6zkztJ3rc7PaqnSeA=})}
+
+\maybeinspic{svg}
+
+\ssec GraphViz 1
+
+\graphviz{
+  digraph {
+    graph [dpi=600];
+    bgcolor = transparent
+    a -> b
+    b -> c [color=red]
+    subgraph cluster_top_floor {
+      a -> c
+    }
+  }
+}
+
+\ssec GraphViz 2
+
+\graphviz{
+  % http://magjac.com/graphviz-visual-editor/
+  graph {
+    bgcolor=lightblue
+    label=Home
+    subgraph cluster_ground_floor {
+      bgcolor=lightgreen
+      label=\bslash"Ground Floor\bslash"
+      Lounge
+      Kitchen
+    }
+    subgraph cluster_top_floor {
+      bgcolor=lightyellow
+      label=\bslash"Top Floor\bslash"
+      Bedroom
+      Bathroom
+    }
+  }
+}
+
+\ssec Low-level TeX interface
+
+\vfil
+
+\def\forpy{\textfile{for.py}{for i in range(10): print(i^2,end=\bslash" \bslash")}}
+
+\guix{py}{\forpy}
+\guix{pyresult}{\eval{python/bin/python3}{\forpy}}
+
+\directlua{includett([[\guixref{py}]], "python")}
+
+\_includett{\guixref{pyresult}}
+
+\hrule
+\bigskip
+
+\def\largel{\textfile{largel.lisp}{%
+(defun myfunc (x)
+  (loop for i to x
+    do (format t \bslash"Hello ~a \bslash" i)))
+(myfunc 5)
+}}
+
+\guix{lis}{\largel}
+
+\guix{lispy}{\eval{sbcl --script}{\largel}}
+
+\_includett{\guixref{lis}}
+
+\_includett{\guixref{lispy}}
+
+\vfil
+
+\pg;
+
+
+\bye
