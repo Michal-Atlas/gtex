@@ -69,6 +69,7 @@ reading_code_spec = ""
 reading_code_idx = 0
 function read_code(s)
    if (s == "") then
+      reading_code_buffer = reading_code_buffer .. "\n"
       return s
    end
    first = utf8.codepoint(s)
