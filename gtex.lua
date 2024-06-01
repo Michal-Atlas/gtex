@@ -83,7 +83,7 @@ function read_code(s)
          guix(idr,
               "((@ (gtex) eval-script) \"" .. reading_code_spec
               .. "\" " .. src .. ")")
-         out = "{\\everytt={\\typosize[24/27]}\\_includett{\\guixref{" .. ids .. "}}\\hrule\\_includett{\\guixref{" .. idr .. "}}}"
+         out = "\\vfil{\\everytt={\\typosize[24/27]}\\_includett{\\guixref{" .. ids .. "}}\\medskip\\hrule\\medskip\\_includett{\\guixref{" .. idr .. "}}}\\vfil"
          return out
       end
       if (reading_code_buffer == "") then
