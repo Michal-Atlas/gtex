@@ -58,8 +58,12 @@ function escape_code(s)
    return s:gsub("\\", "\\\\"):gsub("\"", "\\\""):gsub("\n", "\\n")
 end
 
-gscriptf = io.open(tex.jobname .. ".scm", "w")
+gscriptf = nil
 function guix(id, expr)
+   -- Only open if actually used
+   if (gscriptf == nil) then
+      gscriptf = io.open(tex.jobname .. ".scm", "w")
+   end
    gscriptf:write(id .. ":" .. expr .. "\n")
 end
 
@@ -84,7 +88,7 @@ function read_code(s)
          guix(idr,
               "((@ (gtex) eval-script) \"" .. reading_code_spec
               .. "\" " .. src .. ")")
-         out = "\\vfil{\\everytt={\\typosize[24/27]}\\_includett{\\guixref{" .. ids .. "}}\\medskip\\hrule\\medskip\\_includett{\\guixref{" .. idr .. "}}}\\vfil"
+         out = "\\vfil{\\everytt={\\typosize[24/27]}\\rawincludett{\\guixref{" .. ids .. "}}\\medskip\\hrule\\medskip\\rawincludett{\\guixref{" .. idr .. "}}}\\vfil"
          return out
       end
       if (reading_code_buffer == "") then
