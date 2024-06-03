@@ -1,3 +1,5 @@
+#!/usr/bin/env -S guix repl
+!#
 (define-module (gtex)
   #:use-module (guix packages)
   #:use-module (guix build-system gnu)
@@ -86,9 +88,7 @@
                                  " "
                                  #$args
                                  " "
-                                 #$script))))
-               #;
-               (waitpid (spawn runner (list runner #$script))))))))))
+                                 #$script)))))))))))
 
 (define-public (svg-image src)
   (computed-file
@@ -100,3 +100,7 @@
         #$src
         "-o" #$output
         "-w" "1920"))))
+
+(if (= 2 (length (command-line)))
+    (build-inputs (cadr (command-line)))
+    (display "Usage: gtex <aux file>"))
