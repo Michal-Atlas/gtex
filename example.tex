@@ -1,10 +1,9 @@
-\input gtex.tex
-
 \def\stit{\pg;\tit}
 \def\ssec{\pg;\sec}
 
+\load[gtex,modern]
 
-\input modern.tex
+\load [modern]
 
 \tit Intro to G\TeX{}
 
@@ -92,9 +91,7 @@ print 10 % 3
 
 \ssec Sequent (SVG)
 
-\guix{svg}{((@ (gtex) svg-image) \_remotefile{https://wikimedia.org/api/rest_v1/media/math/render/svg/e0c5b66a8fed889a35d2ea5ff95f0c604351346d}{3yC9Cu5w2uIKfAy8LEZERNCVDG6zkztJ3rc7PaqnSeA=})}
-
-\maybeinspic{svg}
+\rinssvg{svg}{https://wikimedia.org/api/rest_v1/media/math/render/svg/e0c5b66a8fed889a35d2ea5ff95f0c604351346d}{3yC9Cu5w2uIKfAy8LEZERNCVDG6zkztJ3rc7PaqnSeA=}
 
 \ssec GraphViz 1
 
@@ -112,6 +109,8 @@ print 10 % 3
 
 \ssec GraphViz 2
 
+\aq
+
 \graphviz{
   % http://magjac.com/graphviz-visual-editor/
   graph {
@@ -119,13 +118,13 @@ print 10 % 3
     label=Home
     subgraph cluster_ground_floor {
       bgcolor=lightgreen
-      label=\bslash"Ground Floor\bslash"
+      label="Ground Floor"
       Lounge
       Kitchen
     }
     subgraph cluster_top_floor {
       bgcolor=lightyellow
-      label=\bslash"Top Floor\bslash"
+      label="Top Floor"
       Bedroom
       Bathroom
     }
@@ -133,7 +132,6 @@ print 10 % 3
 }
 
 \ssec Low-level TeX interface
-
 \vfil
 
 \def\forpy{\textfile{for.py}{for i in range(10): print(i^2,end=\bslash" \bslash")}}
@@ -143,7 +141,7 @@ print 10 % 3
 
 \directlua{includett([[\guixref{py}]], "python")}
 
-\_includett{\guixref{pyresult}}
+\rawincludett{\guixref{pyresult}}
 
 \hrule
 \bigskip
@@ -159,13 +157,14 @@ print 10 % 3
 
 \guix{lispy}{\eval{sbcl --script}{\largel}}
 
-\_includett{\guixref{lis}}
+\rawincludett{\guixref{lis}}
 
-\_includett{\guixref{lispy}}
+\rawincludett{\guixref{lispy}}
+
+\verbinput (-) {\guixref{lispy}}
 
 \vfil
 
-\pg;
-
+\pg.
 
 \bye
