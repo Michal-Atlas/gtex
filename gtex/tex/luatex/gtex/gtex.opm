@@ -1,0 +1,139 @@
+\_codedecl \gtex {An interface to include results of Guix evaluations}
+
+\_namespace{gtex}
+
+\_def\.gscriptpath{\_jobname.scm}
+\_def\.grespath{\_jobname.inp}
+\_isfile\.gscriptpath\_iffalse\_opwarning{
+The auxiliary file `\.gscriptpath` was created,
+you can use `gtex \.gscriptpath` to create the file `\.grespath` that will contain this document's dependencies.
+}\_fi
+
+\_directlua{require('gtex.lua')}
+
+\_def\.rawincludett#1{\_directlua{includett([[#1]], true)}}
+
+\_def\.includett{\_scantoeol\.rawincludett}
+
+\_nspublic \includett \rawincludett ;
+
+\_doc
+The first gtex primitive, it takes an arbitrary identifier
+(only limitation is it musn't contain a `:`),
+and a Guix expression.
+It writes these to an auxiliary file, so that the results
+of said expression can later be retreived given the chosen identifier.
+\_cod
+
+\_def\.guix#1#2{\_directlua{guix([[#1]], [[#2]])}}
+\_def\.guixref#1{\_directlua{guixref([[#1]])}}
+
+\_nspublic \guix \guixref ;
+
+\_directlua{load_guixrefs([[\.grespath]])}
+
+\_def\.rawremotefile#1#2{
+(let ((h ((@ (guix base64) base64-decode) "#2")))
+  ((@ (guix download) origin)
+    (uri "#1")
+    (method (@ (guix download) url-fetch))
+    (sha256 h)))
+}
+\_def\.remotefile#1#2#3{\.guix{#1}{\.rawremotefile{#2}{#3}}}
+
+\_nspublic \remotefile ;
+
+\_def\.insapdownscale{0.8}
+\_def\.insappic#1{%
+  \_vfil%
+  \_hbox to \_hsize{%
+    \_hfil%
+    \_directlua{insertAPImage("#1", \.insapdownscale)}%
+    \_hfil%
+  }%
+  \_vfil
+}
+
+\_nspublic \insapdownscale \insappic ;
+
+\_def\.maybeinspic#1{%
+  \_isfile{\.guixref{#1}}%
+  \_iftrue\.insappic{\.guixref{#1}}%
+  \_else#1:??%
+  \_fi%
+}
+
+\_def\.rinspic#1#2#3{%
+  \.remotefile{#1}{#2}{#3}%
+  \.maybeinspic{#1}%
+}
+
+\_def\.rinssvg#1#2#3{%
+  \.guix{#1}{((@ (gtex) svg-image) \.rawremotefile{#2}{#3})}%
+  \.maybeinspic{#1}%
+}
+
+\_nspublic \rinspic \rinssvg ;
+
+\_def\.eval#1#2{((@ (gtex) eval-script) "#1" #2)}
+\_def\.feval#1#2#3{((@ (gtex) eval-script) "#2" #3 "#1")}
+
+\_nspublic \eval \feval ;
+
+\_newcount\.gensym_counter
+\_def\.symcr#1{#1\_the\.gensym_counter}
+\_long\_def\.gensym#1#2{
+        \_incr\.gensym_counter%
+        \_def\.sym{\.symcr{#1}}%
+        #2%
+}
+
+\_edef\.quote{"}
+\_def\.maybe_slash{}
+
+\_long\_def\.autoquote{%
+  \_def\.maybe_slash{\_bslash}%
+}
+
+\_def\.aqinit{\_adef"{\.maybe_slash\.quote}}
+\_def\.aq{\.aqinit\.autoquote}
+
+\_nspublic \autoquote \aq \aqinit ;
+
+\_def\.graphviz#1{%
+  \.gensym{graphviz}{%
+    \.guix{\.sym}%
+    {\.feval{dot.png}{graphviz/bin/dot -Tpng}{%
+      \.textfile{dot.dot}{#1}}}
+
+    \.maybeinspic{\.sym}
+}}
+
+\_nspublic \graphviz ;
+
+\_def\.textfile#1#2{((@ (guix gexp) mixed-text-file) "#1" "#2")}
+
+\_nspublic \textfile ;
+
+\_newpublic\_def\printer#1{(display #1)}
+\_newpublic\_def\evaluator{guile}
+
+\_def\.showline#1{%
+  \.gensym{showline}{
+  \.guix{\.sym}{\.eval{\evaluator}{\.textfile{\.sym}{\printer{#1}}}}%
+
+  {\_ttfont
+    #1 => \_directlua{includett([[\.guixref{\.sym}]])}}
+}}
+
+\_nspublic \showline ;
+
+\_endnamespace
+
+\_endcode
+
+\_endinput
+
+;; Local Variables:
+;; mode: TeX
+;; End:
