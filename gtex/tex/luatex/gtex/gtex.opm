@@ -246,7 +246,7 @@ The interpreter and style of printing is overriden by
 \GTeX is heavily opinionated,
 this might change in the future,
 however right now, the target behaviour is to be able to
-throw the given macro in the middle of an \OpTeX slide
+throw the given macro in the middle of an \OpTeX{} slide
 and for it to be readable.
 
 \sec Special Syntax for inline code
