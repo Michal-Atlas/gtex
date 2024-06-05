@@ -58,14 +58,6 @@
         (derivation->output-path mfile)
         inp-file)))))
 
-(define (fmt-python script)
-  (computed-file
-   "fmt-python"
-   #~(system*
-      #$(file-append python-black "/bin/black")
-      "-c"
-      #$script)))
-
 (define* (eval-script spec script #:optional (filename "script-result"))
   (computed-file
    filename
@@ -100,6 +92,23 @@
         #$src
         "-o" #$output
         "-w" "1920"))))
+
+(define (read-gtex-string chr port)
+  (with-output-to-string
+    (lambda ()
+      (let loop ((c (read-char port))
+                 (ignore #f))
+        (let ((re (lambda (i) (loop (read-char port) i))))
+          (unless (and (not ignore) (eq? c #\»))
+            (if ignore
+                (if (eq? c #\»)
+                    (begin (display c) (re #f))
+                    (begin (display #\\) (display c) (re #f)))
+                (if (eq? c #\\)
+                    (re #t)
+                    (begin (display c) (re #f))))))))))
+
+(read-hash-extend #\« read-gtex-string)
 
 (if (= 2 (length (command-line)))
     (build-inputs (cadr (command-line)))
