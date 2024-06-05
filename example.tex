@@ -1,17 +1,34 @@
 \def\stit{\pg;\tit}
 \def\ssec{\pg;\sec}
+\ttline=-2
 
 \load[gtex,modern]
 
-\load [modern]
+\global\typosize[24/27]
+\global\everytt={\typosize[24/27]}
 
-\tit Intro to G\TeX{}
+\tit Showing off \GTeX
+
+\def\remotemethod{(@ (guix git-download) git-fetch)}
+\let\uriwrapper\useit
+\def\inkscapeactions{select:g3122; delete}
+\guix{guix-logo}{\svgrender{
+  (file-append
+        \remotefile{((@ (guix git-download) git-reference)
+                        (url "git://git.savannah.gnu.org/guix/guix-artwork.git")
+                        (commit "693f77b9b5e7f70b0e7cc7cba8b58df6c30b3ab2"))
+                        }{Q+E5ED5FPWQdPnKt+dKTbfvABhbIfW8ZR3+1UdNwG9I=}
+        "/logo/Guix.svg")
+}}
+
+\def\insapdownscale{0.8}
+\insappic{guix-logo}
 
 \stit Line-by-line evaluation
 
 \pg;
 \sec Node
-\typosize[24/27]
+
 {
 \def\printer#1{console.log(#1)}
 \def\evaluator{node}
@@ -20,12 +37,12 @@
 \showline{[1,2,3,4,5].map(x => x + 1)}
 }
 
-\sec Guile
+\ssec Guile
 
 \showline{(+ 1 1)}
 \showline{(+ (/ 3 5) 1)}
 \showline{(map 1+ '(1 2 3 4 5))}
-\pg+\showline{\bslash"Strings also sort of work\bslash"}
+\pg+\showline{"Strings also sort of work"}
 
 \ssec Special syntax
 
@@ -34,7 +51,6 @@ x = { y : 2 }
 console.log(x['y'] + 5)
 »
 
-\everytt={\typosize[24/27]}
 \begtt
  «node
  x = { y : 2 }
@@ -109,8 +125,6 @@ print 10 % 3
 
 \ssec GraphViz 2
 
-\aq
-
 \graphviz{
   % http://magjac.com/graphviz-visual-editor/
   graph {
@@ -134,22 +148,24 @@ print 10 % 3
 \ssec Low-level TeX interface
 \vfil
 
-\def\forpy{\textfile{for.py}{for i in range(10): print(i^2,end=\bslash" \bslash")}}
+\def\forpy{\textfile{for.py}{for i in range(10): print(i^2,end=" ")}}
 
 \guix{py}{\forpy}
 \guix{pyresult}{\eval{python/bin/python3}{\forpy}}
 
-\directlua{includett([[\guixref{py}]], "python")}
+\hisyntax{python}
+\verbinput (-) \guixref{py}
 
-\rawincludett{\guixref{pyresult}}
+\verbinput (-) \guixref{pyresult}
 
+\bigskip
 \hrule
 \bigskip
 
 \def\largel{\textfile{largel.lisp}{%
 (defun myfunc (x)
   (loop for i to x
-    do (format t \bslash"Hello ~a \bslash" i)))
+    do (format t "Hello ~a " i)))
 (myfunc 5)
 }}
 
@@ -157,14 +173,10 @@ print 10 % 3
 
 \guix{lispy}{\eval{sbcl --script}{\largel}}
 
-\rawincludett{\guixref{lis}}
+\verbinput (-) \guixref{lis}
 
-\rawincludett{\guixref{lispy}}
-
-\verbinput (-) {\guixref{lispy}}
+\verbinput (-) \guixref{lispy}
 
 \vfil
 
 \pg.
-
-\bye
