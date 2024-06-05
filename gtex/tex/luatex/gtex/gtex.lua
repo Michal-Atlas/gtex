@@ -1,37 +1,3 @@
-function includett(s, wrap, highlight)
-   local high = ""
-   if (highlight ~= nil) then
-      high = "\\hisyntax{" .. highlight .. "}"
-   end
-   local file = io.open(s:gsub("%s", ""), "r")
-   if (file == nil) then
-      tex.print("\\opwarning{File " .. s .. " couldn't be included}")
-      tex.print("??")
-   else
-      local g = file:read('*a')
-      local s, _ = g:gsub('\\', '\\nbb')
-      if wrap then
-         tex.print('\\begtt ' .. high)
-      end
-      tex.print(s)
-      if wrap then
-         tex.print('\\endtt\n')
-      end
-   end
-end
-
-function insertAPImage(image, mul)
-   local i = img.scan { filename = image };
-   if (i == nil) then
-      tex.print("??\\opwarning{Image " .. image .. " could not be opened}")
-      return
-   end
-   local ratio = math.min(tex.hsize / i.width, tex.vsize / i.height);
-   i.height = i.height * ratio * mul;
-   i.width = i.width * ratio * mul;
-   img.write(i);
-end
-
 function guixref(id)
    local m = " guix:" .. id
    local mac = token.get_macro(m)
@@ -88,7 +54,7 @@ function read_code(s)
          guix(idr,
               "((@ (gtex) eval-script) \"" .. reading_code_spec
               .. "\" " .. src .. ")")
-         out = "\\vfil{\\everytt={\\typosize[24/27]}\\rawincludett{\\guixref{" .. ids .. "}}\\medskip\\hrule\\medskip\\rawincludett{\\guixref{" .. idr .. "}}}\\vfil"
+         out = "\\vfil{\\verbinput(-) \\guixref{" .. ids .. "} \\relax\\medskip\\hrule\\medskip\\verbinput(-) \\guixref{" .. idr .. "} \\relax}\\vfil"
          return out
       end
       if (reading_code_buffer == "") then
