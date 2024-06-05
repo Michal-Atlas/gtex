@@ -2,7 +2,7 @@
 
 \_namespace{gtex}
 
-\_def\.GTeX{\lower.5ex\hbox{G}\kern-.18em\TeX}
+\_def\.GTeX{\hbox{\lower.5ex\hbox{G}\kern-.18em\TeX}}
 
 \_nspublic \GTeX ;
 
