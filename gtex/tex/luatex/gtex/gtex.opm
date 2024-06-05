@@ -16,12 +16,6 @@ you can use `gtex \.gscriptpath` to create the file
 
 \_directlua{require('gtex.lua')}
 
-\_def\.rawincludett#1{\_directlua{includett([[#1]], true)}}
-
-\_def\.includett{\_scantoeol\.rawincludett}
-
-\_nspublic \includett \rawincludett ;
-
 \_doc
 The first \GTeX primitive \~`\guix`,
 it takes an arbitrary identifier
@@ -48,42 +42,63 @@ when you load-in \GTeX.
 \_directlua{load_guixrefs([[\.grespath]])}
 
 \_doc
-\~`\remotefile` takes an identifier, uri and a hash,
+\~`\insremotefile` takes an identifier, uri and a hash,
 and causes Guix to download the file as the result.
-\~`\rawremotefile` doesn't take an identifier and only
-creates the guix expression without registering it with G\TeX.
+\~`\remotefile` doesn't take an identifier and only
+creates the guix expression without registering it with \GTeX.
 \_cod
 
-\_def\.rawremotefile#1#2{
+\_newpublic\_def\remotemethod{(@ (guix download) url-fetch)}
+\_newpublic\_def\uriwrapper#1{"#1"}
+
+\_def\.remotefile#1#2{
 (let ((h ((@ (guix base64) base64-decode) "#2")))
   ((@ (guix download) origin)
-    (uri "#1")
-    (method (@ (guix download) url-fetch))
+    (uri \uriwrapper{#1})
+    (method \remotemethod)
     (sha256 h)))
 }
-\_def\.remotefile#1#2#3{\.guix{#1}{\.rawremotefile{#2}{#3}}}
+\_def\.insremotefile#1#2#3{\.guix{#1}{\.remotefile{#2}{#3}}}
 
-\_nspublic \remotefile ;
+\_nspublic \remotefile \insremotefile ;
 
-\_def\.insapdownscale{0.8}
+\_newpublic\_def\insapdownscale{0.76}
+
 \_def\.insappic#1{%
   \_vfil%
   \_hbox to \_hsize{%
     \_hfil%
-    \_directlua{insertAPImage("#1", \.insapdownscale)}%
+    \_def\.pic{\.maybeinspic{\.guixref{#1}}}
+    \_setbox0=\_vbox{\.pic}
+    \picw=\dimexpr\expr{math.min(\bp{\hsize}/\bp{\wd0}, \bp{\vsize}/\bp{\ht0}) * \insapdownscale * \bp{\wd0}}pt\relax
+    \.pic
     \_hfil%
   }%
   \_vfil
 }
 
-\_nspublic \insapdownscale \insappic ;
+\_nspublic \insappic ;
 
 \_def\.maybeinspic#1{%
-  \_isfile{\.guixref{#1}}%
-  \_iftrue\.insappic{\.guixref{#1}}%
+  \_isfile{#1}%
+  \_iftrue\_inspic{#1}%
   \_else#1:??%
   \_fi%
 }
+
+\_nspublic \maybeinspic ;
+
+\_doc
+\~`\gexpcatcodes` is a utility to make writing GExp heavy Scheme code more convenient under \TeX.
+\_cod
+
+\_def\.gexpcatcodes{
+        \_catcode`\#=12
+        \_catcode`\$=12
+        \_catcode`\;=6
+}
+
+\_nspublic \gexpcatcodes ;
 
 \_doc
 The r in \~`\rinspic` stands for remote,
@@ -93,17 +108,37 @@ The svg variant passes the remote resource through inkscape,
 to render it.
 \_cod
 
+{
+\.gexpcatcodes
+
+\_gdef\.svgrender;1{
+ (computed-file
+   "svg-image.png"
+   #~(begin
+       (setenv "HOME" (getcwd))
+       (system*
+        #$(file-append (@ (gnu packages inkscape) inkscape)
+                       "/bin/inkscape")
+        \isdefined{inkscapeactions}
+                \iftrue#«--actions=\inkscapeactions»\fi
+        #$;1
+        "-o" #$output
+        "-w" "1920")))
+}
+}
+%$
+
 \_def\.rinspic#1#2#3{%
-  \.remotefile{#1}{#2}{#3}%
-  \.maybeinspic{#1}%
+  \.insremotefile{#1}{#2}{#3}%
+  \.insappic{#1}%
 }
 
 \_def\.rinssvg#1#2#3{%
-  \.guix{#1}{((@ (gtex) svg-image) \.rawremotefile{#2}{#3})}%
-  \.maybeinspic{#1}%
+  \.guix{#1}{\.svgrender{\.remotefile{#2}{#3}}}%
+  \.insappic{#1}%
 }
 
-\_nspublic \rinspic \rinssvg ;
+\_nspublic \rinspic \rinssvg \svgrender ;
 
 \_def\.eval#1#2{((@ (gtex) eval-script) "#1" #2)}
 \_def\.feval#1#2#3{((@ (gtex) eval-script) "#2" #3 "#1")}
@@ -148,7 +183,7 @@ will be escaped.
 The \~`\graphviz` environment,
 takes in source in the DOT language,
 and inserts an image of the rendered graph.
-|_cod
+\_cod
 
 \_def\.graphviz#1{%
   \.gensym{graphviz}{%
@@ -156,12 +191,16 @@ and inserts an image of the rendered graph.
     {\.feval{dot.png}{graphviz/bin/dot -Tpng}{%
       \.textfile{dot.dot}{#1}}}
 
-    \.maybeinspic{\.sym}
+    \.insappic{\.sym}
 }}
 
 \_nspublic \graphviz ;
 
-\_def\.textfile#1#2{((@ (guix gexp) mixed-text-file) "#1" "#2")}
+{
+\.gexpcatcodes
+
+\_gdef\.textfile;1;2{((@ (guix gexp) mixed-text-file) ";1" #«;2»)}
+}
 
 \_nspublic \textfile ;
 
@@ -174,13 +213,20 @@ The interpreter and style of printing is overriden by
 \_newpublic\_def\printer#1{(display #1)}
 \_newpublic\_def\evaluator{guile}
 
-\_def\.showline#1{%
-  \.gensym{showline}{
-  \.guix{\.sym}{\.eval{\evaluator}{\.textfile{\.sym}{\printer{#1}}}}%
-
-  {\_ttfont
-    #1 => \_directlua{includett([[\.guixref{\.sym}]])}}
+{
+\.gexpcatcodes
+\_gdef\.showline;1{%
+  \.gensym{showline}{%
+        \.guix{\.sym}{%
+                (computed-file "\.sym"
+                  #~(with-output-to-file #$output
+                        (lambda () (display #«;1»)
+                                   (display " => ")
+                                   (display (call-with-input-file #$\.eval{\evaluator}{\.textfile{\.sym}{\printer{;1}}}
+                                                                  (@ (ice-9 textual-ports) get-string-all))))))}%
+    \_verbinput (-) \.guixref{\.sym} \_relax %
 }}
+}
 
 \_nspublic \showline ;
 
@@ -194,6 +240,18 @@ The interpreter and style of printing is overriden by
 \centerline{\it Michal Atlas}
 
 \maketoc
+
+\sec Foreword
+
+\GTeX is heavily opinionated,
+this might change in the future,
+however right now, the target behaviour is to be able to
+throw the given macro in the middle of an \OpTeX slide
+and for it to be readable.
+
+\sec Special Syntax for inline code
+
+
 
 \printdoctail gtex.opm
 \printdoc gtex.opm
