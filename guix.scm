@@ -2,36 +2,21 @@
  (guix packages)
  (guix gexp)
  (gnu packages tex)
- (gnu packages texlive)
- (gnu packages guile)
- (gnu packages package-management)
- (guix build-system texlive)
- (guix build-system guile))
+ (guix build-system copy))
 
 (define-public gtex
   (package
     (name "gtex")
     (version "0.1")
     (source
-     (local-file "gtex"
+     (local-file "src"
                  #:recursive? #t))
-    (build-system texlive-build-system)
-    (native-inputs
-     (list texlive-luatex
-           texlive-optex))
+    (build-system copy-build-system)
+    (propagated-inputs (list texlive-optex))
     (arguments
-     (list
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-after 'install 'install-script
-            (lambda* (#:key outputs #:allow-other-keys)
-              (let* ((out (assoc-ref outputs "out"))
-                     (path (string-append out "/bin/gtex")))
-                (mkdir (string-append out "/bin"))
-                (copy-file
-                 #$(local-file "gtex.scm")
-                 path)
-                (chmod path #o555)))))))
+     (list #:install-plan
+            #~`(("." "share/texmf-dist/tex/luatex/gtex/" #:exclude ("gtex.scm"))
+                ("gtex.scm" "bin/gtex"))))
     (home-page "")
     (synopsis "")
     (description "")
