@@ -28,7 +28,7 @@
 
 \pg;
 \sec Node
-
+\vfil
 {
 \def\printer#1{console.log(#1)}
 \def\evaluator{node}
@@ -39,10 +39,11 @@
 
 \ssec Guile
 
+\vfil
 \showline{(+ 1 1)}
 \showline{(+ (/ 3 5) 1)}
 \showline{(map 1+ '(1 2 3 4 5))}
-\pg+\showline{"Strings also sort of work"}
+\pg+\showline{"Strings also work"}
 
 \ssec Special syntax
 
@@ -73,7 +74,7 @@ console.log(x['y'] + 5)
 
 \ssec Python 3
 
-«python/bin/python3
+«python/python3
 def foo():
   print(10 % 3)
   return 0 % 2
@@ -87,6 +88,31 @@ foo()
 «python2
 print 10 % 3
 »
+
+\ssec Complex Python
+
+\adef\^^M{\bslash n}%
+\catcode` =13%
+
+% https://matplotlib.org/stable/gallery/
+
+\guix{matplotlib}{\eval{python, python-matplotlib | python3}{\textfile{mat.py}{%
+import matplotlib.pyplot as plt
+import sys
+
+data = {'apple': 10, 'orange': 15, 'lemon': 5, 'lime': 20}
+names = list(data.keys())
+values = list(data.values())
+
+fig, axs = plt.subplots(1, 3, figsize=(9, 3), sharey=True)
+axs[0].bar(names, values)
+axs[1].scatter(names, values)
+axs[2].plot(names, values)
+fig.suptitle('Categorical Plotting')
+plt.savefig(sys.stdout.buffer, format = 'png', dpi = 1200, transparent = True)
+}}}%
+
+\insappic{matplotlib}%
 
 \ssec SBCL
 
@@ -151,7 +177,7 @@ print 10 % 3
 \def\forpy{\textfile{for.py}{for i in range(10): print(i^2,end=" ")}}
 
 \guix{py}{\forpy}
-\guix{pyresult}{\eval{python/bin/python3}{\forpy}}
+\guix{pyresult}{\eval{python/python3}{\forpy}}
 
 \hisyntax{python}
 \verbinput (-) \guixref{py}

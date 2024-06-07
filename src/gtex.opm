@@ -217,7 +217,7 @@ will be escaped.
 \_def\.graphviz#1{%
   \.gensym{graphviz}{%
     \.guix{\.sym}%
-    {\.feval{dot.png}{graphviz/bin/dot -Tpng}{%
+    {\.feval{dot.png}{graphviz/dot -Tpng}{%
       \.textfile{dot.dot}{#1}}}
 
     \.insappic{\.sym}
@@ -297,7 +297,7 @@ read in by Lua with absolutely no \TeX{} involvement.
 For example:
 
 \begtt
-​«python/bin/python3
+​«python/python3
 def foo():
   print(2 % 2)
 

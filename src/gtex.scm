@@ -6,11 +6,13 @@
   #:use-module (guix download)
   #:use-module (guix gexp)
   #:use-module (gnu packages tex)
+  #:use-module (gnu packages bash)
   #:use-module (gnu packages)
   #:use-module (ice-9 textual-ports)
   #:use-module (guix store)
   #:use-module (guix derivations)
   #:use-module (guix monads)
+  #:use-module (guix profiles)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-11)
   #:export (build-inputs
@@ -58,40 +60,52 @@
         (derivation->output-path mfile)
         inp-file)))))
 
-(define* (eval-script spec script #:optional (filename "script-result"))
+(define (packages->profile pkgs)
+  (with-store %store
+    (run-with-store %store
+      (profile-derivation (packages->manifest pkgs)))))
+
+(define (bash-script cmd)
+  (if (string-contains cmd "|")
+      (let*-values (((packages cmd) (string-split-first cmd #\|))
+                    ((first-cmd rest-cmd) (string-split-first (string-trim-both cmd) #\space)))
+        (let ((packages (map (compose specification->package
+                                      string-trim-both)
+                             (string-split (string-trim-both packages) #\,)))
+              (cmd (string-append first-cmd " \"$@\" " rest-cmd)))
+              
+          (mixed-text-file
+           "script.sh"
+           "GUIX_PROFILE=\"" (packages->profile packages) "\"\n"
+           ". \"$GUIX_PROFILE/etc/profile\"\n"
+           cmd)))
+
+      (let*-values (((runner args) (string-split-first cmd #\space))
+                    ((pkg file) (string-split-first runner #\/)))
+        (let ((runner
+               (file-append (specification->package pkg)
+                            (string-append "/bin/"
+                                           (if (zero? (string-length file))
+                                               pkg file)
+                                           " " args))))
+          (mixed-text-file "raw-script.sh"
+                           runner " \"$@\"\n")))))
+
+(define* (eval-script spec script
+                      #:optional
+                      (filename "script-result")
+                      out)
   (computed-file
    filename
-   (let*-values (((runner args) (string-split-first spec #\space))
-                 ((pkg file) (string-split-first runner #\/)))
-     (let ((runner
-            (file-append (specification->package pkg)
-                         (if (zero? (string-length file))
-                             (string-append "/bin/" pkg)
-                             (string-append "/" file)))))
-       #~(with-output-to-file #$output
-           (lambda ()
-             (let ((runner #$runner))
-               (use-modules (ice-9 binary-ports) (ice-9 popen))
-               (put-bytevector
-                (current-output-port)
-                (get-bytevector-all
-                 (open-input-pipe
-                  (string-append runner
-                                 " "
-                                 #$args
-                                 " "
-                                 #$script)))))))))))
+   #~(call-with-output-file #$output
+       (lambda (out)
+         (waitpid
+          (spawn #$(file-append bash "/bin/bash")
+                 (list "bash" #$(bash-script spec) #$script)
+                 #:search-path? #f
+                 #:output out
+                 #$@(if out '(#:error out) '())))))))
 
-(define-public (svg-image src)
-  (computed-file
-   "svg-image.png"
-   #~(begin
-       (setenv "HOME" (getcwd))
-       (system*
-        #$(file-append (@ (gnu packages inkscape) inkscape) "/bin/inkscape")
-        #$src
-        "-o" #$output
-        "-w" "1920"))))
 
 (define (read-gtex-string chr port)
   (with-output-to-string
@@ -101,9 +115,10 @@
         (let ((re (lambda (i) (loop (read-char port) i))))
           (unless (and (not ignore) (eq? c #\»))
             (if ignore
-                (if (eq? c #\»)
-                    (begin (display c) (re #f))
-                    (begin (display #\\) (display c) (re #f)))
+                (case c
+                  ((#\») (display c) (re #f))
+                  ((#\n) (display #\newline) (re #f))
+                  (else (display #\\) (display c) (re #f)))
                 (if (eq? c #\\)
                     (re #t)
                     (begin (display c) (re #f))))))))))
