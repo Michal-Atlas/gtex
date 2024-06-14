@@ -167,6 +167,14 @@ to prevent this you can rebind \`\uriwrapper` for example to \`\useit`.
 
 \_nspublic \rinspic \rinssvg \svgrender ;
 
+  \_doc
+  \`\eval` is what handles most actual external program
+  executions, it takes two arguments, the ``command line''
+  and a Guix file-like to pose as the source code.
+  \`\feval` takes one extra argument for if you need the
+  resulting file to have a specific name.
+  \_cod
+
 \_def\.eval#1#2{((@ (gtex) eval-script) "#1" #2)}
 \_def\.feval#1#2#3{((@ (gtex) eval-script) "#2" #3 "#1")}
 
