@@ -91,12 +91,9 @@ print 10 % 3
 
 \ssec Complex Python
 
-\adef\^^M{\bslash n}%
-\catcode` =13%
-
 % https://matplotlib.org/stable/gallery/
 
-\guix{matplotlib}{\eval{python, python-matplotlib | python3}{\textfile{mat.py}{%
+\beggt{matplotlib}{python, python-matplotlib | python3}
 import matplotlib.pyplot as plt
 import sys
 
@@ -110,7 +107,7 @@ axs[1].scatter(names, values)
 axs[2].plot(names, values)
 fig.suptitle('Categorical Plotting')
 plt.savefig(sys.stdout.buffer, format = 'png', dpi = 1200, transparent = True)
-}}}%
+\endgt
 
 \insappic{matplotlib}%
 

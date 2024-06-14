@@ -262,6 +262,39 @@ will be escaped.
 
 \_nspublic \showline ;
 
+  \_doc
+  \`\beggt` and \`\endgt` create an environment
+  to run a script.
+  The \`\beggt` takes two arguments,
+  the identifier for the result of the evaluation
+  and the command line that will evaluate the code
+  (the result is expected on `stdout`).
+  \GTeX{} then scans until it encounter \`\endgt`.
+  \`\.gtexcatcodes` not to be confused with,
+  \`\.gexpcatcodes` are meant to help with writing
+  inline, whitespace-sensitive code.
+  \_cod
+
+\_def\.gtexcatcodes{%
+  \_adef\^^M{\_bslash n}%
+  \_catcode` =13%
+}
+
+\_def\.beggt#1#2{
+  \_bgroup%
+  \.gtexcatcodes%
+  \.readgt{#1}{#2}%
+}
+
+\_def\.readgt#1#2#3\endgt{
+  \.gensym{readgt}{%
+    \.guix{#1}{\.eval{#2}{\.textfile{\.sym}{#3}}}%
+    \_egroup%
+  }
+}
+
+\_nspublic \beggt ;
+
 \_endnamespace
 \_endcode
 
