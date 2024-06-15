@@ -182,20 +182,25 @@ you can use `gtex \.gscriptpath` to create the file
 \_global\_edef\.panoptexumorigin{
   \.remotefile{((@ (guix git-download) git-reference)
                  (url "https://github.com/spasa47/panoptexum")
-                 (commit "a27ff4be3801084b3a6e683909468dc73eb97184"))
+                 (commit "67f91099d3334e331a6e899dc06a91b9e2377f78"))
               }{vWJUNt8jONeu0YeZNAMk/83KcMnF4OuEu33kIuW0yd4=}
 }
 
 \.gexpcatcodes
 
-\_gdef\.readcsv;1{
+\_gdef\.processedinclude;1{
 (let ((panoptexum \.panoptexumorigin))
   (computed-file
-    "csv.tex"
+    "processed.tex"
     #~(begin
         (system*
-         #$(file-append (@ (gnu packages haskell-xyz) pandoc)
-                        "/bin/pandoc")
+         #$(file-append
+            (origin
+             (method (@ (guix download) url-fetch/tarbomb))
+             (uri "https://github.com/jgm/pandoc/releases/download/3.2/pandoc-3.2-linux-amd64.tar.gz")
+             (sha256 (base64 "6j+W3eVq4Vd8gRhGlLhXbY7+xS4WjOSabn3xRB9Cgok=")))
+                        "/pandoc-3.2/bin/pandoc")
+         \isdefined{pandocflags}\iftrue\pandocflags\fi
          "--to" #$(file-append panoptexum "/optex-writer.lua")
          #$;1
          "-o" #$output))))
@@ -203,12 +208,14 @@ you can use `gtex \.gscriptpath` to create the file
 
 }
 
-\_def\.readcsv#1{%
-  (plain-file "error"
-    "readcsv will fail to compile until Guix updates to Pandoc 3")
+\_gdef\.insproc#1{
+  \.gensym{insproc}{
+    \.guix{\.sym}{\.processedinclude{(local-file "#1")}}
+    \.maybeinput{\.guixref{\.sym}}
+  }
 }
 
-\_nspublic \readcsv ;
+\_nspublic \processedinclude \insproc ;
 
   \_doc
   \sec[cmd] Command Line Interpretation
