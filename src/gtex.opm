@@ -168,17 +168,49 @@ to prevent this you can rebind \`\uriwrapper` for example to \`\useit`.
 \_nspublic \rinspic \rinssvg \svgrender ;
 
   \_doc
+  \sec[cmd] Command Line Interpretation
+  \_cod
+
+  \_doc
   \`\eval` is what handles most actual external program
-  executions, it takes two arguments, the ``command line''
+  executions, it takes two arguments, the ''command line''
   and a Guix file-like to pose as the source code.
-  \`\feval` takes one extra argument for if you need the
+  The result is expected on `stdout`.
+  \`\namedeval` takes one extra argument for if you need the
   resulting file to have a specific name.
+
+  The ''command line'' is interpreted in the following way:
+
+  \secc Doesn't contain |
+
+  The first word is the command, taken to be the
+  name of a known Guix package.
+  The command that will be run is `<pkg-dir>/bin/<pkg-name>`,
+  however if the name contains a `/` it will be `<pkg-name>/bin/<your-suffix>` instead.
+  So `node` runs the equivalent of `$(guix build node)/bin/node $script` and `coreutils/ls` will run
+  `$(guix build coreutils)/bin/ls $script`.
+  The given command receives your script as the first argument.
+  The rest of the line is passed as is.
+
+  \secc Contains |
+
+  In this case the section up until the first `|` is a list of packages
+  to install inside a profile, separated by commas.
+  After that any arbitrary shell pipeline may follow,
+  and it will be evaluated in the context of a profile containing all of the mentioned packages.
+  The first command in the pipeline again receives the script as its first argument.
+
+  i.e. `python, python-scipy, lolcat | python3 | lolcat`
+
+  will run the pipeline `python3 $script | lolcat` %$
+  in a context where those 3 packages are present.
+
   \_cod
 
 \_def\.eval#1#2{((@ (gtex) eval-script) "#1" #2)}
-\_def\.feval#1#2#3{((@ (gtex) eval-script) "#2" #3 "#1")}
+\_def\.namedeval#1#2#3{((@ (gtex) eval-script) "#2" #3 "#1")}
 
-\_nspublic \eval \feval ;
+\_nspublic \eval \namedeval ;
 
 \_newcount\.gensym_counter
 \_def\.symcr#1{#1\_the\.gensym_counter}
@@ -192,18 +224,18 @@ to prevent this you can rebind \`\uriwrapper` for example to \`\useit`.
 \_def\.maybe_slash{}
 
   \_doc
-Since Guile uses quotation marks to delimit some parts
-of the build expressions, they might at times need to be escaped.
-\GTeX's hacky solution to this for now,
-are the following macros.
-\`\aqinit` sets the quotation mark as an active
-character that expands to either a lone quote,
-or an escaped quote if \`\autoquote` appears in scope.
-Since \OpTeX-slides delimits each slide,
-there's a shortcut \`\aq` which you can place
-at the top of a slide and all the quotes in that slide
-will be escaped.
-\_cod
+  Since Guile uses quotation marks to delimit some parts
+  of the build expressions, they might at times need to be escaped.
+  \GTeX's hacky solution to this for now,
+  are the following macros.
+  \`\aqinit` sets the quotation mark as an active
+  character that expands to either a lone quote,
+  or an escaped quote if \`\autoquote` appears in scope.
+  Since \OpTeX-slides delimits each slide,
+  there's a shortcut \`\aq` which you can place
+  at the top of a slide and all the quotes in that slide
+  will be escaped.
+  \_cod
 
 \_long\_def\.autoquote{%
   \_def\.maybe_slash{\_bslash}%
@@ -271,13 +303,12 @@ will be escaped.
   \_doc
   \`\beggt` and \`\endgt` create an environment
   to run a script.
-  The \`\beggt` takes two arguments,
+  \`\beggt` takes two arguments,
   the identifier for the result of the evaluation
-  and the command line that will evaluate the code
-  (the result is expected on `stdout`).
-  \GTeX{} then scans until it encounter \`\endgt`.
+  and the \ref[cmd]{command line} that will evaluate the code.
+  \GTeX{} then scans until it encounters \`\endgt`.
   \`\.gtexcatcodes` not to be confused with,
-  \`\.gexpcatcodes` are meant to help with writing
+  \^`\.gexpcatcodes` are meant to help with writing
   inline, whitespace-sensitive code.
   \_cod
 
@@ -348,10 +379,7 @@ This emits a verbatim inclusion
 of the original code,
 followed by an \`\hline`
 and finally a verbatim inclusion of the stdout of the program.
-The first line contains the command that will receive
-your script as the last argument,
-the specific binary executed is either `<pkg-name>/bin/<pkg-name>`,
-or `<pkg-name>/<your-suffix>` if the first word contains a slash.
+For the interpretation of the first line see \ref[cmd]{Command Line}.
 
 \sec Index
 \begmulti 4
