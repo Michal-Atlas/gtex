@@ -101,6 +101,8 @@ you can use `gtex \.gscriptpath` to create the file
   \`\maybeinspic` is \`\inspic` but only inserts if the image exists.
   \_cod
 
+% This should be a metamacro, but I can't seem to figure it out
+
 \_def\.maybeinspic#1{%
   \_isfile{#1}%
   \_iftrue\_inspic{#1}%
@@ -108,7 +110,14 @@ you can use `gtex \.gscriptpath` to create the file
   \_fi%
 }
 
-\_nspublic \maybeinspic ;
+\_def\.maybeinput#1{%
+  \_isfile{#1}%
+  \_iftrue\_input{#1}%
+  \_else#1:??%
+  \_fi%
+}
+
+\_nspublic \maybeinspic \maybeinput ;
 
   \_doc
   \`\gexpcatcodes` is a set of catcodes to make writing
@@ -166,6 +175,40 @@ you can use `gtex \.gscriptpath` to create the file
 }
 
 \_nspublic \rinspic \rinssvg \svgrender ;
+
+{
+\_def\remotemethod{(@ (guix git-download) git-fetch)}
+\_let\uriwrapper\useit
+\_global\_edef\.panoptexumorigin{
+  \.remotefile{((@ (guix git-download) git-reference)
+                 (url "https://github.com/spasa47/panoptexum")
+                 (commit "a27ff4be3801084b3a6e683909468dc73eb97184"))
+              }{vWJUNt8jONeu0YeZNAMk/83KcMnF4OuEu33kIuW0yd4=}
+}
+
+\.gexpcatcodes
+
+\_gdef\.readcsv;1{
+(let ((panoptexum \.panoptexumorigin))
+  (computed-file
+    "csv.tex"
+    #~(begin
+        (system*
+         #$(file-append (@ (gnu packages haskell-xyz) pandoc)
+                        "/bin/pandoc")
+         "--to" #$(file-append panoptexum "/optex-writer.lua")
+         #$;1
+         "-o" #$output))))
+}
+
+}
+
+\_def\.readcsv#1{%
+  (plain-file "error"
+    "readcsv will fail to compile until Guix updates to Pandoc 3")
+}
+
+\_nspublic \readcsv ;
 
   \_doc
   \sec[cmd] Command Line Interpretation
