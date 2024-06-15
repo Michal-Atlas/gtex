@@ -255,7 +255,7 @@ to prevent this you can rebind \`\uriwrapper` for example to \`\useit`.
 \_def\.graphviz#1{%
   \.gensym{graphviz}{%
     \.guix{\.sym}%
-    {\.feval{dot.png}{graphviz/dot -Tpng}{%
+    {\.namedeval{dot.png}{graphviz/dot -Tpng}{%
       \.textfile{dot.dot}{#1}}}
 
     \.insappic{\.sym}
