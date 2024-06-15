@@ -36,14 +36,27 @@
             pname = "optex-gtex";
             version = "trunk";
             passthru.tlDeps = with pkgs.texlive; [optex];
-            outputs = ["out" "tex"];
+            outputs = ["out" "tex" "texdoc"];
             src = ./src;
             dontPatchShebangs = true;
+            nativeBuildInputs = [(pkgs.texliveSmall.withPackages (pt: [pt.optex]))];
+            buildPhase = ''
+              export TEXMFCACHE=$PWD
+              cp $src/* .
+              function tex () {
+                optex --jobname=gtex '\docgen gtex';
+              }
+              while tex |& grep "TeX me again"
+              do :
+              done;
+            '';
             installPhase = ''
-              dir=$tex/tex/luatex/gtex
-              mkdir -p $dir $out/bin
-              cp -r $src/* $dir
-              mv $dir/gtex.scm $out/bin/gtex
+              texdir=$tex/tex/luatex/gtex
+              docdir=$texdoc/doc/gtex
+              mkdir -p $texdir $out/bin $docdir
+              cp -r $src/* $texdir
+              mv $texdir/gtex.scm $out/bin/gtex
+              mv *.pdf $docdir
             '';
           };
         };
