@@ -39,7 +39,7 @@
             outputs = ["out" "tex" "texdoc"];
             src = ./src;
             dontPatchShebangs = true;
-            nativeBuildInputs = [(pkgs.texliveSmall.withPackages (pt: [pt.optex]))];
+            nativeBuildInputs = [(pkgs.texliveMinimal.withPackages (pt: [pt.optex]))];
             buildPhase = ''
               export TEXMFCACHE=$PWD
               cp $src/* .
