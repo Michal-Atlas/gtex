@@ -98,7 +98,8 @@ you can use `gtex \.gscriptpath` to create the file
 
   \_doc
   \GTeX{} has to deal with many file inclusions from paths that may not exist yet,
-  \`\maybeinspic` is \`\inspic` but only inserts if the image exists.
+  \`\maybeinspic` \`\maybeinput` are \`\inspic` and \`\input` respectively
+  but only insert if the image exists.
   \_cod
 
 % This should be a metamacro, but I can't seem to figure it out
