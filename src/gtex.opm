@@ -175,6 +175,23 @@ you can use `gtex \.gscriptpath` to create the file
 
 \_nspublic \rinspic \rinssvg \svgrender ;
 
+  \_doc
+  \sec Including other formats
+
+  Thanks to spasa47's work on
+  \ulink[https://github.com/spasa47/panoptexum]{Pan\OpTeX{}um}
+  you can include a variety of external formats directly,
+  that will be automatically converted to \OpTeX{} markup.
+  \`\insproc` takes the path to a local file
+  and makes \GTeX{} include it as run through pandoc
+  with an \OpTeX{} writer.
+  You may include extra flags by defining \`\pandocflags`,
+  which will be verbatim inserted into the `system*` invocation%
+  \fnote{this will soon hopefully change to a comma separated list}.
+  \`\processedinclude` generates the build expression
+  around a file-like.
+  \_cod
+
 {
 \_def\remotemethod{(@ (guix git-download) git-fetch)}
 \_let\uriwrapper\useit
