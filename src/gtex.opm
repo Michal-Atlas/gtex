@@ -239,13 +239,13 @@ you can use `gtex \.gscriptpath` to create the file
 
   \_doc
   \`\eval` is what handles most actual external program
-  executions, it takes two arguments, the ''command line''
+  executions, it takes two arguments, the \"command line"
   and a Guix file-like to pose as the source code.
   The result is expected on `stdout`.
   \`\namedeval` takes one extra argument for if you need the
   resulting file to have a specific name.
-
-  The ''command line'' is interpreted in the following way:
+  \enquotes
+  The \"command line" is interpreted in the following way:
 
   \secc Doesn't contain |
 
