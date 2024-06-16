@@ -1,6 +1,6 @@
 \_def\GTeX{\leavevmode\hbox{\lower.5ex\hbox{G}\kern-.18em\TeX}}
 
-\_codedecl \guix {An interface to include results of Guix evaluations <0.3>}
+\_codedecl \guix {An interface to include results of Guix evaluations <0.5>}
 
 \_namespace{gtex}
 
